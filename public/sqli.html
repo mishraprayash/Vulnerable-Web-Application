@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SQL Injection Demo</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+
+        input,
+        button {
+            margin: 10px;
+            padding: 10px;
+        }
+
+        #response {
+            margin-top: 20px;
+            color: red;
+        }
+        .fields{
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            
+        }
+    </style>
+</head>
+
+<body>
+    <h2>SQL Injection Demo</h2>
+    <div class="fields">
+        <input type="text" id="username" placeholder="Enter username">
+        <input type="text" id="password" placeholder="Enter password">
+        <button onclick="testSQLi()">Login</button>
+    </div>
+    <div id="response" style="margin: 20px;"></div>
+    <a href="/" style="margin: 20px;">Go to Home</a>
+
+    <script>
+        function testSQLi() {
+            let username = document.getElementById("username").value;
+            let password = document.getElementById("password").value;
+            fetch('/sqli', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, password })
+            })
+                .then(response => response.json())
+                .then(data => document.getElementById("response").innerText = data.message)
+                .catch(error => console.error("Error:", error));
+        }
+    </script>
+</body>
+
+</html>

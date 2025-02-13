@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cross-Site Scripting (XSS) Attacks</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        html {
+            font-family: sans-serif;
+        }
+
+        body {
+            margin: 0;
+        }
+
+        section {
+            margin: 2rem auto;
+            width: 90%;
+            max-width: 40rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.26);
+            background-color: white;
+            padding: 1rem;
+        }
+
+        .form-control {
+            margin: 1rem 0;
+        }
+
+        .form-control input,
+        .form-control textarea,
+        .form-control label {
+            display: block;
+            width: 100%;
+            font: inherit;
+        }
+
+        .form-control label {
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-control input,
+        .form-control textarea {
+            border: 1px solid #ccc;
+            padding: 0.25rem;
+            border-radius: 4px;
+        }
+
+        .form-control input:focus,
+        .form-control textarea:focus {
+            border-color: #ffbb00;
+            outline: none;
+            background-color: #fcecc1;
+        }
+
+        button {
+            cursor: pointer;
+            font: inherit;
+            border-radius: 6px;
+            border: 1px solid black;
+            background-color: #ffbb00;
+            color: black;
+            padding: 0.5rem 2rem;
+            box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.26);
+        }
+
+        button:focus {
+            outline: none;
+        }
+
+        button:hover,
+        button:active {
+            background-color: #f8cf60;
+        }
+
+        #user-messages ul {
+            padding: 0;
+            margin: 0;
+            list-style: none;
+        }
+
+        .message-item {
+            margin: 0.5rem 0;
+            padding: 0.5rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .message-image {
+            width: 50px;
+            height: 50px;
+            margin-right: 1rem;
+        }
+
+        .message-item img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+        }
+    </style>
+    <script>document.addEventListener('DOMContentLoaded', function () {
+            const userMessages = [];
+            const userMessageForm = document.querySelector('form');
+            const userMessagesList = document.querySelector('ul');
+
+            function renderMessages() {
+                let messageItems = '';
+                for (const message of userMessages) {
+                    messageItems += `
+                    <li class="message-item">
+                        <div class="message-image">
+                            <img src="${message.image}" alt="${message.text}">
+                        </div>
+                        <p>${message.text}</p>
+                    </li>
+                `;
+                }
+                userMessagesList.innerHTML = messageItems;
+            }
+
+            function formSubmitHandler(event) {
+                event.preventDefault();
+                const userMessageInput = event.target.querySelector('textarea');
+                const messageImageInput = event.target.querySelector('input');
+                const userMessage = userMessageInput.value;
+                const imageUrl = messageImageInput.value;
+
+                if (!userMessage.trim() || !imageUrl.trim()) {
+                    alert('Please insert a valid message and image.');
+                    return;
+                }
+
+                userMessages.push({
+                    text: userMessage,
+                    image: imageUrl,
+                });
+
+                userMessageInput.value = '';
+                messageImageInput.value = '';
+
+                renderMessages();
+            }
+
+            userMessageForm.addEventListener('submit', formSubmitHandler);
+        });
+    </script>
+</head>
+
+<body>
+    <section id="user-input">
+        <form>
+            <div class="form-control">
+                <label for="user-message">Your Message</label>
+                <textarea id="user-message" name="user-message"></textarea>
+            </div>
+            <div class="form-control">
+                <label for="message-image">Message Image</label>
+                <input type="text" id="message-image" name="message-image" />
+            </div>
+            <button type="submit">Send Message</button>
+        </form>
+    </section>
+    <section id="user-messages">
+        <ul></ul>
+    </section>
+</body>
+
+</html>

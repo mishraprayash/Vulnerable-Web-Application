@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vulnerable API Documentation</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            padding: 20px;
+        }
+
+        h1 {
+            color: #dc3545;
+        }
+
+        .endpoint {
+            background: #fff;
+            padding: 10px;
+            margin: 20px 0;
+            border-left: 5px solid #007bff;
+            box-shadow: 4px 2px 5px rgba(0, 0, 0, 0.5);
+        }
+
+        .endpoint h2 {
+            margin: 0;
+            font-size: 18px;
+        }
+
+        .example {
+            background: #f1f1f1;
+            padding: 5px;
+            font-family: monospace;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Vulnerable APIs For Testing Purposes</h1>
+
+    <div class="endpoint">
+        <h2>SQL Injection (/sqli)</h2>
+        <p>Simulates an SQL injection vulnerability.</p>
+
+        <span>Demo: </span>
+        <a href="/sqli" style="font-weight: bolder; color:blue;">SQLI</a>
+    </div>
+
+    <div class="endpoint">
+        <h2>NoSQL Injection (/nosqli)</h2>
+        <p>Simulates a NoSQL injection vulnerability.</p>
+
+        <span>Demo: </span>
+        <a href="/nosqli" style="font-weight: bolder; color:blue;">NOSQLI</a>
+    </div>
+
+    <div class="endpoint">
+        <h2>Server-Side Request Forgery (SSRF) (/ssrf)</h2>
+        <p>Allows fetching arbitrary URLs.</p>
+
+        <span>Demo: </span>
+        <a href="/ssrf" style="font-weight: bolder; color:blue;">SSRF</a>
+    </div>
+
+    <div class="endpoint">
+        <h2>Command Injection (/cmdi)</h2>
+        <p>Executes commands from the query parameter.</p>
+
+        <span>Demo: </span>
+        <a href="/cmd" style="font-weight: bolder; color:blue;">Command Injection</a>
+    </div>
+
+    <div class="endpoint">
+        <h2>Cross-Site Scripting (XSS) (/xss)</h2>
+        <p>Reflects input directly into HTML.</p>
+
+        <span>Demo: </span>
+        <a href="/xss" style="font-weight: bolder; color:blue;">CrossSite Scripting(XSS)</a>
+    </div>
+
+    <div class="endpoint">
+        <h2>HTML Injection (/html-injection)</h2>
+        <p>Injects HTML content.</p>
+        <span>Demo: </span>
+        <a href="/html" style="font-weight: bolder; color:blue;">HTML Injection</a>
+    </div>
+
+    <div class="endpoint">
+        <h2>CSS Injection (/css-injection)</h2>
+        <p>Injects CSS styles.</p>
+
+        <span>Demo: </span>
+        <a href="/css" style="font-weight: bolder; color:blue;">CSS Injection</a>
+    </div>
+</body>
+
+</html>

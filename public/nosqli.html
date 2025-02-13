@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NoSQL Injection Demo</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; }
+        input, button { margin: 10px; padding: 10px; }
+        #response { margin-top: 20px; color: red; }
+    </style>
+</head>
+<body>
+    <h2>NoSQL Injection Demo</h2>
+    <input type="text" id="username" placeholder="Enter username">
+    <button onclick="testNoSQLi()">Show my info</button>
+    <div id="response"></div>
+
+    <script>
+        function testNoSQLi() {
+            let username = document.getElementById("username").value;
+            fetch('/nosqli', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username })
+            })
+            .then(response => response.json())
+            .then(data => document.getElementById("response").innerText = data.message)
+            .catch(error => console.error("Error:", error));
+        }
+    </script>
+</body>
+</html>
