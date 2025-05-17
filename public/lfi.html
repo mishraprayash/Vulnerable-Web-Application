@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Local File Inclusion Demo</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        h2 {
+            color: #2c3e50;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+        
+        .demo-container {
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        input {
+            width: 70%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        button:hover {
+            background-color: #2980b9;
+        }
+        
+        #response {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f1f1f1;
+            border-radius: 5px;
+            max-height: 400px;
+            overflow: auto;
+            white-space: pre-wrap;
+            font-family: monospace;
+        }
+        
+        .note-box {
+            background-color: #e8f4fc;
+            border-left: 4px solid #3498db;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 0 4px 4px 0;
+        }
+        
+        .warning-box {
+            background-color: #fdecea;
+            border-left: 4px solid #e74c3c;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 0 4px 4px 0;
+        }
+        
+        .success-box {
+            background-color: #e8f5e9;
+            border-left: 4px solid #2ecc71;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 0 4px 4px 0;
+        }
+        
+        code {
+            background-color: #f1f1f1;
+            padding: 2px 4px;
+            border-radius: 3px;
+            font-family: monospace;
+        }
+        
+        ul.payloads {
+            list-style-type: none;
+            padding: 0;
+        }
+        
+        ul.payloads li {
+            background-color: #f1f1f1;
+            margin: 5px 0;
+            padding: 8px;
+            border-radius: 3px;
+            font-family: monospace;
+        }
+    </style>
+</head>
+
+<body>
+    <h2>Local File Inclusion (LFI) Vulnerability Demo</h2>
+    
+    <div class="demo-container">
+        <h3>Test the Vulnerability</h3>
+        <input type="text" id="filePath" placeholder="Enter file path (e.g., ./public/../package.json)">
+        <button onclick="testLFI()">Read File</button>
+        <div id="response">File content will appear here...</div>
+    </div>
+
+    <div class="note-box">
+        <h3>How This Attack Works</h3>
+        <p>Local File Inclusion occurs when an application unsafely includes files from the server based on user input. In this demo:</p>
+        <ol>
+            <li>The server accepts a file path from the user without proper validation</li>
+            <li>Malicious users can manipulate the path to access sensitive files</li>
+            <li>The server reads and returns the contents of unauthorized files</li>
+        </ol>
+        
+        <h4>Why This Code is Vulnerable:</h4>
+        <ul>
+            <li><strong>No path normalization:</strong> Fails to properly resolve <code>../</code> sequences</li>            <li><strong>Direct file system access:</strong> Uses user input directly in file operations</li>
+        </ul>
+    </div>
+
+    <div class="warning-box">
+        <h3>Example Exploit Payloads</h3>
+        <p>Try these malicious inputs based on the location of this project in your local machine to see how the vulnerability works</p>
+        <p>You need to tweak the payload yourselves depending on differnt systems and bypass different checks to actually gain the access to the protected files😝</p>
+        <ul class="payloads">
+            <li>../../etc/passwd (Linux/MacOS)</li>
+            <li>..\..\Windows\System32\drivers\etc\hosts (Windows)</li>
+            <li>./public/%252e%252e/%252e%252e/etc/passwd (Double encoding)</li>
+            <li>./public/../../etc/passwd%00.txt (Null byte injection)</li>
+            <li>./public/....//....//etc/passwd (Double dot bypass)</li>
+            <li>\\\\localhost\\C$\\Windows\\System32\\drivers\\etc\\hosts (Windows UNC path)</li>
+        </ul>
+    </div>
+
+    <div class="success-box">
+        <h3>How to Prevent LFI Vulnerabilities</h3>
+        <p><strong>Proper input validation and secure coding practices:</strong></p>
+        <ol>
+            <li><strong>Whitelist allowed directories:</strong>
+                <code><pre>const safePath = path.join(__dirname, 'public', userInput);</pre></code>
+            </li>
+            <li><strong>Validate file extensions:</strong>
+                <code><pre>if (!file.endsWith('.txt')) throw new Error("Invalid file type");</pre></code>
+            </li>
+            <li><strong>Normalize and verify paths:</strong>
+                <code><pre>const absolutePath = path.resolve(file);
+if (!absolutePath.startsWith('/safe/directory/')) {
+    throw new Error("Access denied");
+}</pre></code>
+            </li>
+            <li><strong>Use indirect file references:</strong> Store files with IDs instead of direct paths</li>
+            <li><strong>Disable dangerous characters:</strong> Block <code>../</code>, <code>%00</code>, and directory separators</li>
+        </ol>
+        <p><strong>Remember:</strong> Never trust user input when accessing filesystem resources!</p>
+    </div>
+
+    <script>
+        function testLFI() {
+            const file = document.getElementById("filePath").value;
+            if (!file) {
+                alert("Please enter a file path");
+                return;
+            }
+
+            document.getElementById("response").innerText = "Loading...";
+            
+            fetch('/lfi', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ file })
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById("response").innerText = data.message || "No content returned";
+            })
+            .catch(error => {
+                document.getElementById("response").innerText = "Error: " + error.message;
+                console.error("Error:", error);
+            });
+        }
+    </script>
+</body>
+
+</html>

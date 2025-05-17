@@ -1,100 +1,172 @@
+<!-- Vulnerable Backend/public/index.html --> 
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vulnerable API Documentation</title>
+    <title>Sentinel: Vulnerable Web Application</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: #f8f9fa;
             padding: 20px;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
         }
 
         h1 {
             color: #dc3545;
+            margin-bottom: 10px;
         }
 
-        .endpoint {
-            background: #fff;
-            padding: 10px;
-            margin: 20px 0;
-            border-left: 5px solid #007bff;
-            box-shadow: 4px 2px 5px rgba(0, 0, 0, 0.5);
+        .subtitle {
+            font-size: 1.2rem;
+            color: #6c757d;
         }
 
-        .endpoint h2 {
-            margin: 0;
-            font-size: 18px;
-        }
-
-        .example {
-            background: #f1f1f1;
-            padding: 5px;
-            font-family: monospace;
+        .warning {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
             border-radius: 5px;
+            padding: 15px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .vulnerabilities {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .vulnerability {
+            background: #fff;
+            border-radius: 8px;
+            padding: 20px;
+            border-left: 5px solid #007bff;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .vulnerability:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .vulnerability h2 {
+            margin-top: 0;
+            color: #343a40;
+            font-size: 1.4rem;
+            border-bottom: 1px solid #e9ecef;
+            padding-bottom: 10px;
+        }
+
+        .vulnerability p {
+            color: #6c757d;
+            line-height: 1.6;
+        }
+
+        .demo-link {
+            display: inline-block;
+            margin-top: 15px;
+            background-color: #007bff;
+            color: white;
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+
+        .demo-link:hover {
+            background-color: #0056b3;
+        }
+
+        .educational-note {
+            background-color: #e2f0fd;
+            border-left: 4px solid #007bff;
+            padding: 15px;
+            margin: 30px 0;
+            border-radius: 4px;
+        }
+
+        footer {
+            margin-top: 40px;
+            text-align: center;
+            padding: 20px;
+            color: #6c757d;
+            border-top: 1px solid #dee2e6;
         }
     </style>
 </head>
 
 <body>
-    <h1>Vulnerable APIs For Testing Purposes</h1>
+    <header>
+        <h1>Sentinel: Vulnerable Web Application</h1>
+        <div class="subtitle">A deliberately vulnerable application for cybersecurity education</div>
+    </header>
 
-    <div class="endpoint">
-        <h2>SQL Injection (/sqli)</h2>
-        <p>Simulates an SQL injection vulnerability.</p>
-
-        <span>Demo: </span>
-        <a href="/sqli" style="font-weight: bolder; color:blue;">SQLI</a>
+    <div class="warning">
+        <strong>⚠️ WARNING:</strong> This application contains intentional security vulnerabilities for educational purposes only.
+        DO NOT deploy in production environments or on publicly accessible servers.
     </div>
 
-    <div class="endpoint">
-        <h2>NoSQL Injection (/nosqli)</h2>
-        <p>Simulates a NoSQL injection vulnerability.</p>
-
-        <span>Demo: </span>
-        <a href="/nosqli" style="font-weight: bolder; color:blue;">NOSQLI</a>
+    <div class="educational-note">
+        <h3>How to Use This Application</h3>
+        <p>Each vulnerability has its own dedicated page where you can experiment with different attack payloads. Click on any of the vulnerabilities below to start exploring. Use this application to understand how these vulnerabilities work and how to protect against them in real applications.</p>
     </div>
 
-    <div class="endpoint">
-        <h2>Server-Side Request Forgery (SSRF) (/ssrf)</h2>
-        <p>Allows fetching arbitrary URLs.</p>
+    <div class="vulnerabilities">
+        <div class="vulnerability">
+            <h2>SQL Injection (SQLi)</h2>
+            <p>Exploiting SQL databases by injecting malicious SQL code into queries. Try inserting special characters and SQL statements to manipulate the database query.</p>
+            <a href="/sqli" class="demo-link">Try SQLi Demo</a>
+        </div>
 
-        <span>Demo: </span>
-        <a href="/ssrf" style="font-weight: bolder; color:blue;">SSRF</a>
+        <div class="vulnerability">
+            <h2>NoSQL Injection</h2>
+            <p>Similar to SQL injection but targeting NoSQL databases like MongoDB. Try using JSON objects with operators to bypass authentication.</p>
+            <a href="/nosqli" class="demo-link">Try NoSQL Injection</a>
+        </div>
+
+        <div class="vulnerability">
+            <h2>Server-Side Request Forgery (SSRF)</h2>
+            <p>Forcing the server to make unintended requests to internal or external systems. Manipulate the target URL to access restricted resources.</p>
+            <a href="/ssrf" class="demo-link">Try SSRF Demo</a>
+        </div>
+
+        <div class="vulnerability">
+            <h2>Command Injection</h2>
+            <p>Executing arbitrary system commands through vulnerable application functions. Try appending commands using operators like ; | && to run multiple commands.</p>
+            <a href="/cmd" class="demo-link">Try Command Injection</a>
+        </div>
+
+        <div class="vulnerability">
+            <h2>Cross-Site Scripting (XSS)</h2>
+            <p>Injecting malicious scripts that execute in users' browsers. Try inserting HTML tags and JavaScript code to see how they execute in the page context.</p>
+            <a href="/xss" class="demo-link">Try XSS Demo</a>
+        </div>
+
+        <div class="vulnerability">
+            <h2>Local File Inclusion (LFI)</h2>
+            <p>Accessing files on the server through path manipulation. Try accessing system files like /etc/passwd or application files outside the intended directory.</p>
+            <a href="/lfi" class="demo-link">Try LFI Demo</a>
+        </div>
     </div>
 
-    <div class="endpoint">
-        <h2>Command Injection (/cmdi)</h2>
-        <p>Executes commands from the query parameter.</p>
-
-        <span>Demo: </span>
-        <a href="/cmd" style="font-weight: bolder; color:blue;">Command Injection</a>
-    </div>
-
-    <div class="endpoint">
-        <h2>Cross-Site Scripting (XSS) (/xss)</h2>
-        <p>Reflects input directly into HTML.</p>
-
-        <span>Demo: </span>
-        <a href="/xss" style="font-weight: bolder; color:blue;">CrossSite Scripting(XSS)</a>
-    </div>
-
-    <div class="endpoint">
-        <h2>HTML Injection (/html-injection)</h2>
-        <p>Injects HTML content.</p>
-        <span>Demo: </span>
-        <a href="/html" style="font-weight: bolder; color:blue;">HTML Injection</a>
-    </div>
-
-    <div class="endpoint">
-        <h2>CSS Injection (/css-injection)</h2>
-        <p>Injects CSS styles.</p>
-
-        <span>Demo: </span>
-        <a href="/css" style="font-weight: bolder; color:blue;">CSS Injection</a>
-    </div>
+    <footer>
+        <p>Created for educational purposes only. Learn about web security responsibly.</p>
+        <p>Resources: <a href="https://owasp.org/www-project-top-ten/" target="_blank">OWASP Top Ten</a> | <a href="https://portswigger.net/web-security" target="_blank">PortSwigger Web Security Academy</a></p>
+    </footer>
 </body>
 
 </html>

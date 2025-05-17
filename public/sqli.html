@@ -1,60 +1,125 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SQL Injection Demo</title>
+    <title>SQL Injection Vulnerability Demo</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css">
     <style>
         body {
-            font-family: Arial, sans-serif;
-            text-align: center;
+            padding: 20px;
+            background-color: #f8f9fa;
         }
-
-        input,
-        button {
-            margin: 10px;
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .card {
+            margin-bottom: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        pre {
+            background-color: #f1f1f1;
             padding: 10px;
+            border-radius: 5px;
+            overflow-x: auto;
         }
-
         #response {
-            margin-top: 20px;
-            color: red;
+            max-height: 300px;
+            overflow-y: auto;
         }
-        .fields{
-            width: 100%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            
+        .nav-pills .nav-link.active {
+            background-color: #343a40;
+        }
+        .vulnerability-description {
+            margin-bottom: 20px;
         }
     </style>
 </head>
-
 <body>
-    <h2>SQL Injection Demo</h2>
-    <div class="fields">
-        <input type="text" id="username" placeholder="Enter username">
-        <input type="text" id="password" placeholder="Enter password">
-        <button onclick="testSQLi()">Login</button>
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 class="mb-0">SQL Injection Demo</h1>
+            <a href="/" class="btn btn-outline-secondary">Home</a>
+        </div>
+
+        <div class="vulnerability-description">
+            <p>SQL Injection occurs when untrusted input is included in SQL queries without proper sanitization. This can allow attackers to manipulate the application's database by injecting their own SQL commands.</p>
+        </div>
+
+        <div class="card mb-4">
+            <div class="card-header bg-danger text-white">
+                <h5 class="mb-0">Vulnerability Demo</h5>
+            </div>
+            <div class="card-body">
+                <form id="sqliForm">
+                    <div class="mb-3">
+                        <label for="username" class="form-label">Username:</label>
+                        <input type="text" class="form-control" id="username" placeholder="Enter username">
+                    </div>
+                    <div class="mb-3">
+                        <label for="password" class="form-label">Password:</label>
+                        <input type="password" class="form-control" id="password" placeholder="Enter password">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header bg-dark text-white">
+                <h5 class="mb-0">Response</h5>
+            </div>
+            <div class="card-body">
+                <pre id="response">Results will appear here...</pre>
+            </div>
+        </div>
+
+        <div class="card mt-4">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0">Example Payloads</h5>
+            </div>
+            <div class="card-body">
+                <h6>Username field:</h6>
+                <ul>
+                    <li><code>admin</code> - Normal query</li>
+                    <li><code>admin' --</code> - Basic SQL injection with comment</li>
+                    <li><code>admin' OR '1'='1</code> - Authentication bypass</li>
+                    <li><code>admin'; DROP TABLE users; --</code> - Destructive injection</li>
+                </ul>
+
+                <h6>Password field:</h6>
+                <ul>
+                    <li><code>' OR '1'='1</code> - Authentication bypass</li>
+                    <li><code>password' OR 1=1 --</code> - Another bypass technique</li>
+                    <li><code>x' UNION SELECT username,password FROM users --</code> - Union-based injection</li>
+                </ul>
+            </div>
+        </div>
     </div>
-    <div id="response" style="margin: 20px;"></div>
-    <a href="/" style="margin: 20px;">Go to Home</a>
 
     <script>
-        function testSQLi() {
-            let username = document.getElementById("username").value;
-            let password = document.getElementById("password").value;
-            fetch('/sqli', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ username, password })
-            })
-                .then(response => response.json())
-                .then(data => document.getElementById("response").innerText = data.message)
-                .catch(error => console.error("Error:", error));
-        }
+        document.getElementById('sqliForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            
+            try {
+                const response = await fetch('/sqli', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ username, password })
+                });
+                
+                const data = await response.json();
+                if(data.malicious===true){
+                    window.location.href=data.message
+                }
+                document.getElementById('response').textContent = JSON.stringify(data,null,2);
+            } catch (error) {
+                document.getElementById('response').textContent = 'Error: ' + error.message;
+            }
+        });
     </script>
-</body>
-
-</html>

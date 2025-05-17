@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!-- <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -25,9 +25,240 @@
                 body: JSON.stringify({ username })
             })
             .then(response => response.json())
-            .then(data => document.getElementById("response").innerText = data.message)
+            .then(data =>{
+                if(data.malicious){
+                    window.location.replace(data.message)
+                }
+                document.getElementById("response").innerText = data.message
+            })
             .catch(error => console.error("Error:", error));
         }
     </script>
 </body>
+</html> -->
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NoSQL Injection Demo</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        h2 {
+            color: #2c3e50;
+            border-bottom: 2px solid #f39c12;
+            padding-bottom: 10px;
+        }
+
+        .demo-container {
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        input {
+            width: 70%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-family: monospace;
+        }
+
+        button {
+            background-color: #f39c12;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            font-weight: bold;
+        }
+
+        button:hover {
+            background-color: #e67e22;
+        }
+
+        #response {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #fef5e7;
+            border-radius: 5px;
+            max-height: 400px;
+            overflow: auto;
+            white-space: pre-wrap;
+            font-family: monospace;
+            border-left: 4px solid #f39c12;
+        }
+
+        .note-box {
+            background-color: #e8f4fc;
+            border-left: 4px solid #3498db;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 0 4px 4px 0;
+        }
+
+        .warning-box {
+            background-color: #fdecea;
+            border-left: 4px solid #e74c3c;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 0 4px 4px 0;
+        }
+
+        .success-box {
+            background-color: #e8f5e9;
+            border-left: 4px solid #2ecc71;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 0 4px 4px 0;
+        }
+
+        code {
+            background-color: #f1f1f1;
+            padding: 2px 4px;
+            border-radius: 3px;
+            font-family: monospace;
+        }
+
+        ul.payloads {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        ul.payloads li {
+            background-color: #f1f1f1;
+            margin: 5px 0;
+            padding: 8px;
+            border-radius: 3px;
+            font-family: monospace;
+        }
+
+        .malicious-warning {
+            color: #e74c3c;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <h2>NoSQL Injection (NoSQLi) Vulnerability Demo</h2>
+
+    <div class="demo-container">
+        <h3>Test the Vulnerability</h3>
+        <input type="text" id="username" placeholder="Enter username (e.g., admin)">
+        <button onclick="testNoSQLi()">Search User</button>
+        <div id="response">User data will appear here...</div>
+        <div id="malicious-warning" class="malicious-warning" style="display: none;"></div>
+    </div>
+
+    <div class="note-box">
+        <h3>How This Attack Works</h3>
+        <p>NoSQL Injection occurs when an application unsafely processes user input for database queries:</p>
+        <ol>
+            <li>The server takes user input and embeds it directly into a MongoDB query</li>
+            <li>Attackers can inject query operators like <code>$ne</code>, <code>$gt</code>, or JavaScript expressions
+            </li>
+            <li>The database executes the modified query, potentially exposing unauthorized data</li>
+        </ol>
+
+        <h4>Why This Code is Vulnerable:</h4>
+        <ul>
+            <li><strong>Object injection:</strong> Uses <code>safeParse()</code> which can still allow MongoDB operators
+            </li>
+            <li><strong>No type checking:</strong> Accepts JSON-like input that gets converted to query objects</li>
+            <li><strong>Verbose errors:</strong> Returns database errors to the client</li>
+        </ul>
+    </div>
+
+    <div class="warning-box">
+        <h3>Example Exploit Payloads</h3>
+        <p>Try these malicious inputs to bypass authentication or extract data:</p>
+        <ul class="payloads">
+            <li><strong>Always true condition:</strong> <code>{"$ne": null}</code></li>
+            <li><strong>Regex bypass:</strong> <code>{"$regex": ".*"}</code></li>
+            <li><strong>Boolean-based attack:</strong> <code>{"$gt": ""}</code></li>
+            <li><strong>JavaScript injection:</strong> <code>{"$where": "true"}</code></li>
+            <li><strong>Extract all users:</strong> <code>{"name": {"$exists": true}}</code></li>
+            <li><strong>Time-based attack:</strong> <code>{"$where": "sleep(5000) || true"}</code></li>
+        </ul>
+        <p class="warning"><strong>⚠️ Warning:</strong> These can expose sensitive data from your database.</p>
+    </div>
+
+    <div class="success-box">
+        <h3>How to Prevent NoSQL Injection</h3>
+        <p><strong>Secure coding practices:</strong></p>
+        <ol>
+            <li><strong>Validate input types:</strong>
+                <code><pre>if (typeof username !== 'string') {
+    throw new Error("Username must be a string");
+}</pre></code>
+            </li>
+            <li><strong>Use parameterized queries:</strong>
+                <code><pre>const query = { name: username.trim() };</pre></code>
+            </li>
+            <li><strong>Sanitize input:</strong>
+                <code><pre>// Remove MongoDB operators
+username = username.replace(/[\$]|where|ne|gt|regex/g, '');</pre></code>
+            </li>
+            <li><strong>Use ORM/ODM:</strong>
+                <code><pre>// Use Mongoose with schema validation
+User.findOne({ name: username });</pre></code>
+            </li>
+        </ol>
+        <p><strong>Remember:</strong> Never trust user input in database queries!</p>
+    </div>
+
+    <script>
+        function testNoSQLi() {
+            const username = document.getElementById("username").value;
+            if (!username) {
+                alert("Please enter a username");
+                return;
+            }
+
+            document.getElementById("response").innerText = "Searching user...";
+            document.getElementById("malicious-warning").style.display = "none";
+
+            fetch('/nosqli', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.malicious) {
+                        document.getElementById("response").innerText = "Traffic Blocked";
+                        document.getElementById("malicious-warning").style.display = "block";
+                        document.getElementById("malicious-warning").innerText =
+                            "⚠️ Malicious activity detected";
+                    }
+                    else {
+                        document.getElementById("response").innerText =
+                            typeof data.message === 'object'
+                                ? JSON.stringify(data.message, null, 2)
+                                : data.message;
+                    }
+                })
+                .catch(error => {
+                    document.getElementById("response").innerText = "Error: " + error.message;
+                    console.error("Error:", error);
+                });
+        }
+    </script>
+</body>
+
 </html>
